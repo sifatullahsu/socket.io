@@ -41,6 +41,20 @@ const schema = new Schema(
         },
       },
     ],
+    removed: {
+      soft: [
+        {
+          type: Types.ObjectId,
+          required: true,
+          ref: "User",
+        },
+      ],
+      hard: {
+        type: Boolean,
+        default: false,
+        required: true,
+      },
+    },
   },
   {
     timestamps: true,
