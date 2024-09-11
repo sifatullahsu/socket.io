@@ -20,6 +20,11 @@ const schema = new Schema(
             type: Boolean,
             required: true,
           },
+          lastSeen: {
+            type: Date,
+            default: Date.now(),
+            required: true,
+          },
         },
       ],
       validate: {
