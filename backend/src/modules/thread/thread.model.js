@@ -78,4 +78,12 @@ const schema = new Schema(
   }
 );
 
+schema.virtual("messages", {
+  localField: "_id",
+  foreignField: "conversation",
+  ref: "Message",
+  skip: 0,
+  perDocumentLimit: 50,
+});
+
 export const Thread = model("Thread", schema);
