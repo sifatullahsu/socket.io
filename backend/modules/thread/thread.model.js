@@ -36,7 +36,25 @@ const schema = new Schema(
           required: true,
         },
         image: {
-          type: String,
+          type: {
+            name: {
+              type: String,
+              required: true,
+            },
+            size: {
+              type: Number,
+              required: true,
+            },
+            type: {
+              type: String,
+              required: true,
+            },
+            url: {
+              type: String,
+              required: true,
+            },
+          },
+          default: null,
         },
       },
       validate: {
