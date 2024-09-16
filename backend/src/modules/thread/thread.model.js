@@ -11,20 +11,8 @@ const schema = new Schema(
     participants: {
       type: [
         {
-          user: {
-            type: Types.ObjectId,
-            required: true,
-            ref: "User",
-          },
-          isAdmin: {
-            type: Boolean,
-            required: true,
-          },
-          lastSeen: {
-            type: Date,
-            default: Date.now(),
-            required: true,
-          },
+          user: { type: Types.ObjectId, required: true, ref: "User" },
+          lastSeen: { type: Date, default: Date.now(), required: true },
         },
       ],
       validate: {
@@ -36,34 +24,33 @@ const schema = new Schema(
     },
     group: {
       type: {
-        name: {
-          type: String,
-          required: true,
-        },
+        name: { type: String, required: true },
         image: {
           type: {
-            name: {
-              type: String,
-              required: true,
-            },
-            size: {
-              type: Number,
-              required: true,
-            },
-            type: {
-              type: String,
-              required: true,
-            },
-            url: {
-              type: String,
-              required: true,
-            },
-            id: {
-              type: String,
-              required: true,
-            },
+            id: { type: String, required: true },
+            name: { type: String, required: true },
+            size: { type: Number, required: true },
+            type: { type: String, required: true },
+            url: { type: String, required: true },
           },
           default: null,
+        },
+        admins: {
+          type: [{ type: Types.ObjectId, required: true, ref: "User" }],
+          validate: {
+            validator: function (value) {
+              if (this.type === "group" && this.group) {
+                const participantIds = this.participants.map((p) =>
+                  p.user.toString()
+                );
+                return this.group.admins.every((adminId) =>
+                  participantIds.includes(adminId.toString())
+                );
+              }
+              return true;
+            },
+            message: "Each admin in the group must also be a participant.",
+          },
         },
       },
       validate: {
@@ -78,12 +65,8 @@ const schema = new Schema(
   {
     timestamps: true,
     versionKey: false,
-    toJSON: {
-      virtuals: true,
-    },
-    toObject: {
-      virtuals: true,
-    },
+    toJSON: { virtuals: true },
+    toObject: { virtuals: true },
   }
 );
 
