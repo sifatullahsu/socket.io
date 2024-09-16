@@ -1,4 +1,4 @@
-import { Thread } from "./thread.model";
+import { Thread } from "./thread.model.js";
 
 const getOperation = async ({ id }) => {
   const result = await Thread.find({ _id: id }, "", {

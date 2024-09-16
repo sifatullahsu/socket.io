@@ -33,7 +33,6 @@ const schema = new Schema(
             type: { type: String, required: true },
             url: { type: String, required: true },
           },
-          default: null,
         },
         admins: {
           type: [{ type: Types.ObjectId, required: true, ref: "User" }],
