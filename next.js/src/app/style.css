@@ -1,0 +1,36 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+
+body {
+  @apply text-gray-600;
+  font-weight: 400;
+  font-style: normal;
+  letter-spacing: -1px;
+  background: #282A2E;
+  color: #EEEEEE;
+}
+
+input {
+  @apply border p-2 rounded-lg text-sm bg-[#3F424A] w-full;
+  border-color: rgb(85 90 102);
+}
+
+input:focus-visible {
+  outline: unset;
+  border-color: rgb(116 124 143);
+}
+
+button.rr-custom {
+  @apply text-xs border px-2 py-1 bg-gray-100 text-gray-500 rounded-lg;
+}
+
+.messages::-webkit-scrollbar {
+  display: none;
+}
+
+.messages {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
