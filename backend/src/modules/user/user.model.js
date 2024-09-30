@@ -1,3 +1,4 @@
+import bcrypt from "bcrypt";
 import { model, Schema } from "mongoose";
 
 const schema = new Schema(
@@ -7,11 +8,11 @@ const schema = new Schema(
     password: { type: String, required: true, select: false },
     image: {
       type: {
-        id: { type: String, required: true },
-        name: { type: String, required: true },
-        size: { type: Number, required: true },
-        type: { type: String, required: true },
-        url: { type: String, required: true },
+        id: { type: String },
+        name: { type: String },
+        size: { type: Number },
+        type: { type: String },
+        url: { type: String },
       },
     },
   },
@@ -22,5 +23,21 @@ const schema = new Schema(
     toObject: { virtuals: true },
   }
 );
+
+schema.statics.hashGenerator = async (password) => {
+  return await bcrypt.hash(password, 10);
+};
+
+schema.pre("save", async function () {
+  this.password = await User.hashGenerator(this.password);
+});
+
+schema.pre("updateOne", async function () {
+  const user = this.getUpdate();
+
+  if (user?.password) {
+    user.password = await User.hashGenerator(user.password);
+  }
+});
 
 export const User = model("User", schema);

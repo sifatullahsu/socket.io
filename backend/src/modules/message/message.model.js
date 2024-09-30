@@ -1,9 +1,19 @@
 import { model, Schema, Types } from "mongoose";
 
+const xType = ["message", "notification"];
+
 const schema = new Schema(
   {
+    type: { type: String, enum: xType, default: "message" },
     conversation: { type: Types.ObjectId, required: true, ref: "Thread" },
-    sender: { type: Types.ObjectId, required: true, ref: "User" },
+    sender: {
+      type: Types.ObjectId,
+      required: function () {
+        return this.type === "message";
+      },
+      ref: "User",
+      default: null,
+    },
     reply: { type: Types.ObjectId, ref: "Message", default: null },
     message: { type: String, default: "" },
     files: [

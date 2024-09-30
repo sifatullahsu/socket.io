@@ -1,4 +1,4 @@
-import { model, Schema } from "mongoose";
+import { model, Schema, Types } from "mongoose";
 
 const schema = new Schema(
   {
@@ -13,6 +13,7 @@ const schema = new Schema(
         {
           user: { type: Types.ObjectId, required: true, ref: "User" },
           lastSeen: { type: Date, default: Date.now(), required: true },
+          deletedAt: { type: Date, default: null },
         },
       ],
       validate: {
@@ -27,11 +28,11 @@ const schema = new Schema(
         name: { type: String, required: true },
         image: {
           type: {
-            id: { type: String, required: true },
-            name: { type: String, required: true },
-            size: { type: Number, required: true },
-            type: { type: String, required: true },
-            url: { type: String, required: true },
+            id: { type: String },
+            name: { type: String },
+            size: { type: Number },
+            type: { type: String },
+            url: { type: String },
           },
         },
         admins: {
@@ -59,6 +60,7 @@ const schema = new Schema(
         message: "`group` must be null when type is 'single'.",
       },
       default: null,
+      _id: false,
     },
   },
   {
@@ -76,5 +78,42 @@ schema.virtual("messages", {
   skip: 0,
   perDocumentLimit: 50,
 });
+
+schema.statics.addParticipant = async (id, userId) => {
+  return await Thread.updateOne(
+    { _id: id, type: "group" },
+    { $push: { participants: { user: userId } } }
+  );
+};
+
+schema.statics.addAdmin = async (id, userId) => {
+  return await Thread.updateOne(
+    { _id: id, type: "group" },
+    { $push: { "group.admins": userId } }
+  );
+};
+
+schema.statics.removeParticipant = async (id, userId) => {
+  return await Thread.updateOne(
+    { _id: id, type: "group", "participants.user": { $in: [userId] } },
+    { $set: { "participants.$[x].deletedAt": Date.now() } },
+    { arrayFilters: [{ "x._id": userId }], new: true }
+  );
+};
+
+schema.statics.removeAdmin = async (id, userId) => {
+  return await Thread.updateOne(
+    { _id: id, type: "group", "group.admins": { $in: [userId] } },
+    { $pull: { "group.admins": userId } }
+  );
+};
+
+schema.statics.updateLastSeen = async (id, userId) => {
+  return await Thread.updateOne(
+    { _id: id, participants: { $in: [userId] } },
+    { $set: { "participants.$[x].lastSeen": Date.now() } },
+    { arrayFilters: [{ "x._id": userId }], new: true }
+  );
+};
 
 export const Thread = model("Thread", schema);
